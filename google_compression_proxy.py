@@ -32,9 +32,19 @@ def get(url, headers={}, **kwargs):
         url = url[7:]
     elif url.startswith('https://'):
         url = url[8:]
-    proxy_headers.update({'Host': url})
+
+    path_idx = url.find('/')
+    if path_idx == -1:
+        host = url
+        path = '/'
+    else:
+        host = url[:path_idx]
+        path = url[path_idx:]
+
+    proxy_headers.update({'Host': host})
 
     if 'headers' in kwargs.keys():
         proxy_headers.update(kwargs.pop('headers'))
 
-    return requests.get('http://compress.googlezip.net:80', headers=proxy_headers, **kwargs)
+    return requests.get('http://compress.googlezip.net:80{path}'.format(path=path),
+                        headers=proxy_headers, **kwargs)
